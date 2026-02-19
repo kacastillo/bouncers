@@ -4,6 +4,7 @@
 #include <bn_sprite_ptr.h>
 #include <bn_display.h>
 #include <bn_random.h>
+#include <bn_vector.h>
 
 #include "bn_sprite_items_dot.h"
 
@@ -24,44 +25,35 @@ static constexpr bn::fixed MAX_DY = 2;
 int main() {
     bn::core::init();
 
-    bn::random rng = bn::random();
-
-    bn::fixed starting_x = rng.get_fixed(MIN_X, MAX_X);
-    bn::fixed starting_y = rng.get_fixed(MIN_Y, MAX_Y);
-
-    bn::sprite_ptr bouncer = bn::sprite_items::dot.create_sprite(starting_x, starting_y);
-
-    bn::fixed dx = rng.get_fixed(MIN_DX, MAX_DX);
-    bn::fixed dy = rng.get_fixed(MIN_DY, MAX_DY);
+    bn::vector<bn::sprite_ptr, 20> sprites = {};
+    bn::vector<bn::fixed, 20> speeds = {};
 
     while(true) {
 
-        bn::fixed x = bouncer.x();
-        bn::fixed y = bouncer.y();
-
-        x += dx;
-        y += dy;
-
-        if(x > MAX_X) {
-            x = MAX_X;
-            dx *=-1;
-        }
-        if(x < MIN_X) {
-            x = MIN_X;
-            dx *= -1;
+        if(bn::keypad::a_pressed()) {
+            sprites.push_back(bn::sprite_items::dot.create_sprite());
+            speeds.push_back(3);
         }
 
-        if(y > MAX_Y) {
-            y = MAX_Y;
-            dy *= -1;
-        }
-        if(y < MIN_Y) {
-            y = MIN_Y;
-            dy *= -1;
-        }
+        for(int i = 0; i < sprites.size(); i++) {
+            bn::sprite_ptr sprite = sprites[i];
 
-        bouncer.set_x(x);
-        bouncer.set_y(y);
+            bn::fixed x = sprite.x();
+
+            x += speeds[i];
+
+            if(x > MAX_X) {
+                x = MAX_X;
+                speeds[i] *=-1;
+            }
+            if(x < MIN_X) {
+                x = MIN_X;
+                speeds[i] *= -1;
+            }
+
+            sprite.set_x(x);
+
+        }
 
         bn::core::update();
     }
