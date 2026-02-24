@@ -12,6 +12,9 @@
 static constexpr int HALF_SCREEN_WIDTH = bn::display::width() / 2;
 static constexpr bn::fixed MIN_X = -HALF_SCREEN_WIDTH;
 static constexpr bn::fixed MAX_X = HALF_SCREEN_WIDTH;
+static constexpr int HALF_SCREEN_HEIGHT = bn::display::height() / 2;
+static constexpr bn::fixed MAX_Y = HALF_SCREEN_HEIGHT;
+static constexpr bn::fixed MIN_Y = -HALF_SCREEN_HEIGHT;
 
 // Starting speed of a bouncer
 static constexpr bn::fixed BASE_SPEED = 2;
@@ -23,21 +26,37 @@ class Bouncer {
     public:
         bn::sprite_ptr sprite = bn::sprite_items::dot.create_sprite();
         bn::fixed x_speed = BASE_SPEED;
+        bn::fixed y_speed = BASE_SPEED;
 
         void update() {
             bn::fixed x = sprite.x();
-            x += x_speed;
+            bn::fixed y = sprite.y();
 
+    
+            x += x_speed;
+            y += y_speed;
             if(x > MAX_X) {
                 x = MAX_X;
                 x_speed *=-1;
             }
-            if(x < MIN_X) {
+
+            if(x < MIN_X) { //reverse
                 x = MIN_X;
                 x_speed *= -1;
             }
 
+            if (y > MAX_Y) {
+                y = MAX_Y;
+                y_speed *=-1;
+            }
+
+            if (y < MIN_Y) {
+                y = MIN_Y;
+                y_speed *=-1;
+            }
+
             sprite.set_x(x);
+            sprite.set_y(y);
         }
     };
 
@@ -64,11 +83,9 @@ void add_bouncer(bn::vector<Bouncer, MAX_BOUNCERS>& bouncers)   {
 
 int main() {
     bn::core::init();
-
     bn::vector<Bouncer, MAX_BOUNCERS> bouncers = {};
 
     while(true) {
-        // if A is pressed add a new bouncer
         if(bn::keypad::a_pressed()) {
            add_bouncer(bouncers);
         }
@@ -76,8 +93,7 @@ int main() {
         if(bn::keypad::b_pressed()) {
           BN_LOG("Average x: ", average_x(bouncers));
         }
-
-        // for each bouncer
+        
        for(Bouncer& bouncer : bouncers) {
         bouncer.update();
        }
