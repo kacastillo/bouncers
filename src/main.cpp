@@ -10,6 +10,8 @@
 #include "bn_sprite_items_dot.h"
 #include "bn_sprite_items_avg_sprite.h"
 
+
+
 static constexpr int HALF_SCREEN_WIDTH = bn::display::width() / 2;
 static constexpr bn::fixed MIN_X = -HALF_SCREEN_WIDTH;
 static constexpr bn::fixed MAX_X = HALF_SCREEN_WIDTH;
